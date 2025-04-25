@@ -51,6 +51,11 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    GENDER_CHOICES = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+    ]
+    
     email = models.EmailField(max_length=120, unique=True, blank=True, null=True)
     user_name = models.CharField(max_length=150, blank=True, null=True)
     phone_number = models.CharField(
@@ -60,6 +65,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     date_created = models.DateTimeField(auto_now_add=True)
     password = models.CharField(max_length=100, blank=True, null=True, validators=[MinLengthValidator(8), validate_not_only_letters])
+    national_id = models.CharField(max_length=20, blank=True, null=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
     
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

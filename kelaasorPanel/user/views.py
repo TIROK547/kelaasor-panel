@@ -11,14 +11,27 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.core.cache import cache
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.contrib.auth.models import Group
 
 api = KavenegarAPI('2F3441543830615A2B71616F7831315162635563767459776A435A70783348794D39393175506545596D6B3D')  # بهتره اینو در settings بذاری
-
 
 class CreateUserView(CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = UserSerializer
     queryset = User.objects.all()
+
+    @staticmethod
+    def assign_group(user, role_name="default user"):
+        try:
+            group = Group.objects.get(name=role_name)
+            user.groups.add(group)
+            user.save()
+        except Group.DoesNotExist:
+            pass 
+
+    def perform_create(self, serializer):
+        user = serializer.save()
+        self.assign_group(user)
 
 
 class GetVerificationCodeView(APIView):
@@ -57,3 +70,4 @@ class VerifyCodeView(APIView):
             return Response({"status": "success", "message": "Code is correct."}, status=status.HTTP_200_OK)
         else:
             return Response({"status": "error", "message": "Invalid verification code."}, status=status.HTTP_400_BAD_REQUEST)
+        
