@@ -5,7 +5,6 @@ from user.models import User
 
 class BootCampCategory(models.Model):
     name = models.CharField(max_length=100)
-
     def __str__(self):
         return self.name
 
@@ -62,3 +61,25 @@ class BootCampParticipant(models.Model):
 
     def __str__(self):
         return f"{self.user} as {self.role} in {self.bootcamp}"
+
+
+class BootCampsJoinRequest(models.Model):
+    PLAN_FULL = 'full'
+    PLAN_INSTALLMENT = 'installment'
+
+    PLAN_CHOICES = [
+        (PLAN_FULL, 'پرداخت کامل'),
+        (PLAN_INSTALLMENT, 'پرداخت اقساطی'),
+    ]
+
+    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
+    bootCamp = models.ForeignKey(to=BootCamp, on_delete=models.CASCADE)
+    plan = models.CharField(max_length=20, choices=PLAN_CHOICES)
+
+    accepted = models.BooleanField(default=False)
+    
+    def get_final_price(self):
+        base_price = self.bootCamp.price
+        if self.plan == self.PLAN_INSTALLMENT:
+            return int(base_price * 1.1)
+        return base_price

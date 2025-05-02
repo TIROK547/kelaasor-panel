@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'ticket',
     'django_extensions',
-    'admin_status'
+    'admin_status',
+    'bootcamps'
 ]
 
 MIDDLEWARE = [
