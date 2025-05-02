@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'user.apps.UserConfig',
     'rest_framework',
     'ticket',
+    'django_extensions',
     'admin_status'
 ]
 

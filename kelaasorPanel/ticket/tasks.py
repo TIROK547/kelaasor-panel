@@ -6,14 +6,16 @@ from .models import Ticket
 from django.core.mail import send_mail
 from django.utils.timezone import now
 from django.contrib.auth.models import Group
+from django.utils import timezone
+from datetime import timedelta
 
 @shared_task
 def alert_support(user_id, ticket_id, category):
     user = User.objects.get(id=user_id)
     ticket = Ticket.objects.get(id=ticket_id)
-    send_login_email(user, category, ticket)
+    send_email(user, category, ticket)
 
-def send_login_email(user, category, ticket):
+def send_email(user, category, ticket):
     group_name = ""
     if category == "technical":
         group_name = "tech_support"
@@ -36,3 +38,13 @@ def send_login_email(user, category, ticket):
         fail_silently=False,
     )
     print(recipient_emails)
+
+@shared_task
+def close_old_tickets():
+    seven_days_ago = timezone.now() - timedelta(days=7)
+    tickets = Ticket.objects.filter(
+        status__in=['pending', 'answered', 'unanswered'],
+        date_created__lt=seven_days_ago
+    )
+    updated_count = tickets.update(status='closed')
+    return f"{updated_count} tickets closed"
