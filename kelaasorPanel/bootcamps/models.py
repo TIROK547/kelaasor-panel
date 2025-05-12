@@ -5,8 +5,16 @@ from user.models import User
 
 class BootCampCategory(models.Model):
     name = models.CharField(max_length=100)
+    IN_PERSON = 'in_person'
+    ONLINE = 'online'
+    TYPE_CHOICES = [
+        (IN_PERSON, 'حضوری'),
+        (ONLINE, 'آنلاین'),
+    ]
+    bootcamp_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    
     def __str__(self):
-        return self.name
+        return self.name 
 
 
 class BootCamp(models.Model):
@@ -39,10 +47,13 @@ class BootCamp(models.Model):
 
     def __str__(self):
         return self.title
-
     def clean(self):
+        super().clean()
         if self.start_date > self.end_date:
             raise ValidationError("تاریخ شروع نمی‌تواند بعد از تاریخ پایان باشد.")
+        
+        if self.category and self.bootcamp_type != self.category.bootcamp_type:
+            raise ValidationError("نوع بوت‌کمپ باید با نوع دسته‌بندی آن مطابقت داشته باشد.")
 
 
 class BootCampParticipant(models.Model):
@@ -71,15 +82,23 @@ class BootCampsJoinRequest(models.Model):
         (PLAN_FULL, 'پرداخت کامل'),
         (PLAN_INSTALLMENT, 'پرداخت اقساطی'),
     ]
+    
+    STATE_CHOICES = [
+    ('accepted', 'Accepted'),
+    ('rejected', 'Rejected'),
+    ('pending', 'Pending'),
+    ]
 
-    user = models.OneToOneField(to=User, on_delete=models.CASCADE)
+    state = models.CharField(max_length=20, choices=STATE_CHOICES, default="pending")
+    
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     bootCamp = models.ForeignKey(to=BootCamp, on_delete=models.CASCADE)
     plan = models.CharField(max_length=20, choices=PLAN_CHOICES)
-
-    accepted = models.BooleanField(default=False)
     
+    @property
     def get_final_price(self):
-        base_price = self.bootCamp.price
+        final_price = self.bootCamp.price
         if self.plan == self.PLAN_INSTALLMENT:
-            return int(base_price * 1.1)
-        return base_price
+            return int(final_price * 1.1)
+        return final_price
+    

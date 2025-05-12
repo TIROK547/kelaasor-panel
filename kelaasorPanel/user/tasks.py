@@ -8,7 +8,7 @@ api_key = '314833384F37563970364B3766613442744D6B325877543645567353496B336A71425
 
 @shared_task
 def get_verification_code(code, phone_number="09125994340"):
-
+    
     url = f'https://api.kavenegar.com/v1/{api_key}/sms/send.json'
 
     params = {

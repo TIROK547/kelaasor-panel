@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'ticket',
     'django_extensions',
     'admin_status',
-    'bootcamps'
+    'bootcamps',
+    'financial'
 ]
 
 MIDDLEWARE = [
