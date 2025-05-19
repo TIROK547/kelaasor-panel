@@ -11,18 +11,30 @@ from rest_framework import status as drf_status
 
 
 class ListAllBootcampsJoinRequestsView(ListAPIView):
+    """
+    Lists all bootcamp join requests.
+    Accessible only to superusers.
+    """
     queryset = BootCampsJoinRequest.objects.all()
     permission_classes = [IsSuperUserType]
     serializer_class = BootCampsJoinRequestSerializer
     
     
 class ListBootcampsJoinRequestsView(ListAPIView):
+    """
+    Lists only pending bootcamp join requests.
+    Accessible only to superusers.
+    """
     queryset = BootCampsJoinRequest.objects.filter(state="pending")
     permission_classes = [IsSuperUserType]
     serializer_class = BootCampsJoinRequestSerializer
 
 
 class DecideBootcampJoinRequestState(UpdateAPIView):
+    """
+    Updates the state of a join request. If the new state is 'accepted' and no related Factor exists,
+    a Factor is automatically created.
+    """
     queryset = BootCampsJoinRequest.objects.all()
     permission_classes = [IsSuperUserType]
     serializer_class = BootCampsJoinRequestSerializer
@@ -49,6 +61,9 @@ class DecideBootcampJoinRequestState(UpdateAPIView):
     
 
 class CreateBootcampJoinRequestView(CreateAPIView):
+    """
+    Allows an authenticated user to submit a join request to a bootcamp.
+    """
     queryset = BootCampsJoinRequest.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = BootCampsJoinRequestSerializer
@@ -58,24 +73,36 @@ class CreateBootcampJoinRequestView(CreateAPIView):
 
 
 class CreateBootcampCategoryView(CreateAPIView):
+    """
+    Allows a superuser to create a new bootcamp category.
+    """
     queryset = BootCampCategory.objects.all()
     permission_classes = [IsSuperUserType]
     serializer_class = BootCampCategorySerializer
 
 
 class CreateBootcampView(CreateAPIView):
+    """
+    Allows a superuser to create a new bootcamp.
+    """
     queryset = BootCamp.objects.all()
     permission_classes = [IsSuperUserType]
     serializer_class = BootCampSerializer
 
 
 class ListBootCampCategory(ListAPIView):
+    """
+    Public view to list all bootcamp categories.
+    """
     queryset = BootCampCategory.objects.all()
     permission_classes = [AllowAny]
     serializer_class = BootCampCategorySerializer
     
 
 class ListBootcampsView(ListAPIView):
+    """
+    Public view to list all bootcamps, with optional filtering by state and category_id.
+    """
     permission_classes = [AllowAny]
     serializer_class = BootCampSerializer
 
@@ -90,4 +117,3 @@ class ListBootcampsView(ListAPIView):
             filters["bootcamp_state"] = state
             
         return BootCamp.objects.filter(**filters)
-

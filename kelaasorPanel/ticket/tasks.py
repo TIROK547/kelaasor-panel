@@ -11,11 +11,27 @@ from datetime import timedelta
 
 @shared_task
 def alert_support(user_id, ticket_id, category):
+    """
+    Celery task to alert support admins via email about a new ticket.
+    
+    Args:
+        user_id (int): ID of the user who created the ticket.
+        ticket_id (int): ID of the ticket.
+        category (str): Ticket category ('technical' or 'financial').
+    """
     user = User.objects.get(id=user_id)
     ticket = Ticket.objects.get(id=ticket_id)
     send_email(user, category, ticket)
 
 def send_email(user, category, ticket):
+    """
+    Helper function to send notification email to the appropriate support group.
+    
+    Args:
+        user (User): The user who created the ticket.
+        category (str): The ticket category.
+        ticket (Ticket): The ticket instance.
+    """
     group_name = ""
     if category == "technical":
         group_name = "tech_support"
@@ -41,6 +57,12 @@ def send_email(user, category, ticket):
 
 @shared_task
 def close_old_tickets():
+    """
+    Celery task to close tickets older than 7 days that are still open.
+    
+    Returns:
+        str: Summary message indicating how many tickets were closed.
+    """
     seven_days_ago = timezone.now() - timedelta(days=7)
     tickets = Ticket.objects.filter(
         status__in=['pending', 'answered', 'unanswered'],

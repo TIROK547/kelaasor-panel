@@ -8,43 +8,63 @@ from rest_framework import status as drf_status
 
 
 class ListAllPaymentsView(ListAPIView):
+    """
+    Admin view to list all payment records.
+    """
     permission_classes = [IsAdminUser]
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
     
     
 class ListUnpaidPaymentsView(ListAPIView):
+    """
+    Admin view to list all payments that have not been accepted yet.
+    """
     permission_classes = [IsAdminUser]
     serializer_class = PaymentSerializer
     queryset = Payment.objects.exclude(state='accepted')
     
     
 class CreatePaymentView(CreateAPIView):
+    """
+    Admin view to create a new payment record.
+    """
     permission_classes = [IsAdminUser]
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
-    
-#----
+
 
 class ListAllFactorsView(ListAPIView):
+    """
+    Admin view to list all financial factors (invoices).
+    """
     permission_classes = [IsAdminUser]
     serializer_class = FactorSerializer
     queryset = Factor.objects.all()
     
     
 class ListUnpaidFactorsView(ListAPIView):
+    """
+    Admin view to list all unpaid factors (invoices).
+    """
     permission_classes = [IsAdminUser]
     serializer_class = FactorSerializer
     queryset = Factor.objects.filter(paid=False)
-    
-#----
-    
+
+
 class DecidePaymentStateView(UpdateAPIView):
+    """
+    Admin view to update the state of a payment. 
+    If payment is accepted, triggers payment logic and possibly marks the factor as paid.
+    """
     queryset = Payment.objects.all()
     permission_classes = [IsAdminUser]
     serializer_class = PaymentSerializer
     
     def patch(self, request, *args, **kwargs):
+        """
+        Handle partial update to change payment state. If payment gets accepted, calls mark_as_paid().
+        """
         instance = self.get_object()
         prev_status = instance.state
         

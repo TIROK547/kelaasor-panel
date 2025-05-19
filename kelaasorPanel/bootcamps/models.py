@@ -4,6 +4,9 @@ from user.models import User
 
 
 class BootCampCategory(models.Model):
+    """
+    Represents a category for bootcamps with a specific type (in-person or online).
+    """
     name = models.CharField(max_length=100)
     IN_PERSON = 'in_person'
     ONLINE = 'online'
@@ -18,6 +21,9 @@ class BootCampCategory(models.Model):
 
 
 class BootCamp(models.Model):
+    """
+    Represents a bootcamp with its metadata such as category, type, dates, capacity, and participants.
+    """
     IN_PERSON = 'in_person'
     ONLINE = 'online'
     TYPE_CHOICES = [
@@ -47,7 +53,12 @@ class BootCamp(models.Model):
 
     def __str__(self):
         return self.title
+
     def clean(self):
+        """
+        Ensures that the start date is not after the end date and 
+        that the bootcamp type matches the category type.
+        """
         super().clean()
         if self.start_date > self.end_date:
             raise ValidationError("تاریخ شروع نمی‌تواند بعد از تاریخ پایان باشد.")
@@ -57,6 +68,9 @@ class BootCamp(models.Model):
 
 
 class BootCampParticipant(models.Model):
+    """
+    Represents a participant in a bootcamp, with a specific role (student, teacher, or mentor).
+    """
     ROLE_CHOICES = [
         ('student', 'دانشجو'),
         ('teacher', 'مدرس'),
@@ -75,6 +89,9 @@ class BootCampParticipant(models.Model):
 
 
 class BootCampsJoinRequest(models.Model):
+    """
+    Represents a request by a user to join a bootcamp with a specific payment plan.
+    """
     PLAN_FULL = 'full'
     PLAN_INSTALLMENT = 'installment'
 
@@ -84,9 +101,9 @@ class BootCampsJoinRequest(models.Model):
     ]
     
     STATE_CHOICES = [
-    ('accepted', 'Accepted'),
-    ('rejected', 'Rejected'),
-    ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+        ('pending', 'Pending'),
     ]
 
     state = models.CharField(max_length=20, choices=STATE_CHOICES, default="pending")
@@ -97,8 +114,11 @@ class BootCampsJoinRequest(models.Model):
     
     @property
     def get_final_price(self):
+        """
+        Calculates the final price for the bootcamp based on the selected payment plan.
+        An installment plan adds a 10% surcharge.
+        """
         final_price = self.bootCamp.price
         if self.plan == self.PLAN_INSTALLMENT:
             return int(final_price * 1.1)
         return final_price
-    

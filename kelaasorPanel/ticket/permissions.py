@@ -2,7 +2,9 @@ from rest_framework.permissions import BasePermission
 
 class IsAdminUserType(BasePermission):
     """
-    Allows access only to financial admins, other admins, or superusers.
+    Custom permission to allow access only to:
+    - Superusers
+    - Users in 'fin_support' or 'tech_support' groups (financial or technical support/admins)
     """
 
     def has_permission(self, request, view):
@@ -20,10 +22,13 @@ class IsAdminUserType(BasePermission):
         return False
 
 
-
 class IsTicketOwnerOrSupport(BasePermission):
     """
-    Allows access only to the ticket owner or the assigned support/admin.
+    Custom permission to allow access only to:
+    - The user who created the ticket
+    - Superusers
+    - Financial support group for financial tickets
+    - Technical support group for technical tickets
     """
 
     def has_permission(self, request, view):
