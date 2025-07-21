@@ -19,3 +19,19 @@ class UserSerializer(ModelSerializer):
             user.set_password(password)
         user.save()
         return user
+
+
+
+class CustomAccountSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        exclude = ["password"]
+
+
+
+
+class CAccountSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = "__all__"
+
